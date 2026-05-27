@@ -43,6 +43,11 @@
     #search-button:hover {
       background-color: #4096ff;
     }
+    #debug {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +56,7 @@
     <h3 style="margin-top: 0;">地点搜索</h3>
     <input type="text" id="search-input" placeholder="输入地点名称（如：天安门）">
     <button id="search-button">搜索</button>
+    <div id="debug"></div>
   </div>
   <script type="text/javascript">
     window._AMapSecurityConfig = {
@@ -59,6 +65,14 @@
   </script>
   <script type="text/javascript" src="/amap/api/maps?v=2.0"></script>
   <script type="text/javascript">
+    function debug(msg) {
+      console.log(msg);
+      var debugEl = document.getElementById('debug');
+      if (debugEl) {
+        debugEl.innerHTML += '<br>' + msg;
+      }
+    }
+
     var map = new AMap.Map('container', {
       viewMode: '2D',
       zoom: 11,
@@ -75,6 +89,7 @@
     var placeSearch;
     // 加载搜索插件
     AMap.plugin('AMap.PlaceSearch', function() {
+      debug('搜索插件加载完成');
       placeSearch = new AMap.PlaceSearch({
         pageSize: 10,
         pageIndex: 1,
@@ -83,56 +98,68 @@
         map: map, // 绑定地图
         panel: null // 不使用默认面板
       });
-      console.log('搜索插件加载完成');
     });
 
-    // 搜索功能
-    document.getElementById('search-button').addEventListener('click', function() {
-      var keyword = document.getElementById('search-input').value;
-      console.log('搜索关键词:', keyword);
-      if (!keyword) {
-        alert('请输入搜索关键词');
+    // 确保DOM加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      debug('DOM加载完成');
+      var searchButton = document.getElementById('search-button');
+      var searchInput = document.getElementById('search-input');
+      
+      if (!searchButton) {
+        debug('搜索按钮未找到');
         return;
       }
-      if (placeSearch) {
-        console.log('开始搜索...');
-        placeSearch.search(keyword, function(status, result) {
-          console.log('搜索结果状态:', status);
-          console.log('搜索结果:', result);
-          if (status === 'complete' && result.info === 'OK') {
-            var pois = result.poiList.pois;
-            if (pois.length > 0) {
-              var firstPoi = pois[0];
-              map.setZoomAndCenter(15, firstPoi.location);
-              // 添加标记
-              var marker = new AMap.Marker({
-                position: firstPoi.location,
-                title: firstPoi.name
-              });
-              map.clearMap();
-              map.add(marker);
-              // 信息窗体
-              var infoWindow = new AMap.InfoWindow({
-                content: '<h3>' + firstPoi.name + '</h3><p>' + (firstPoi.address || '暂无地址') + '</p>'
-              });
-              infoWindow.open(map, firstPoi.location);
+      
+      // 搜索功能
+      searchButton.addEventListener('click', function() {
+        debug('搜索按钮被点击');
+        var keyword = searchInput.value;
+        debug('搜索关键词: ' + keyword);
+        if (!keyword) {
+          alert('请输入搜索关键词');
+          return;
+        }
+        if (placeSearch) {
+          debug('开始搜索...');
+          placeSearch.search(keyword, function(status, result) {
+            debug('搜索结果状态: ' + status);
+            debug('搜索结果: ' + JSON.stringify(result).substring(0, 200));
+            if (status === 'complete' && result.info === 'OK') {
+              var pois = result.poiList.pois;
+              if (pois.length > 0) {
+                var firstPoi = pois[0];
+                map.setZoomAndCenter(15, firstPoi.location);
+                // 添加标记
+                var marker = new AMap.Marker({
+                  position: firstPoi.location,
+                  title: firstPoi.name
+                });
+                map.clearMap();
+                map.add(marker);
+                // 信息窗体
+                var infoWindow = new AMap.InfoWindow({
+                  content: '<h3>' + firstPoi.name + '</h3><p>' + (firstPoi.address || '暂无地址') + '</p>'
+                });
+                infoWindow.open(map, firstPoi.location);
+              } else {
+                alert('未找到相关地点');
+              }
             } else {
-              alert('未找到相关地点');
+              alert('搜索失败：' + result.info);
             }
-          } else {
-            alert('搜索失败：' + result.info);
-          }
-        });
-      } else {
-        alert('搜索插件尚未加载完成');
-      }
-    });
+          });
+        } else {
+          alert('搜索插件尚未加载完成');
+        }
+      });
 
-    // 回车键搜索
-    document.getElementById('search-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('search-button').click();
-      }
+      // 回车键搜索
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchButton.click();
+        }
+      });
     });
   </script>
 </body>
