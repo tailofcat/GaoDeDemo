@@ -28,6 +28,33 @@
       zoom: 11,
       center: [116.397428, 39.90923]
     });
+
+    // 添加缩放控件
+    map.addControl(new AMap.Zoom({
+      position: 'RT'
+    }));
+
+    // 添加比例尺控件
+    map.addControl(new AMap.Scale({
+      position: 'LB'
+    }));
+
+    // 添加工具条
+    map.addControl(new AMap.ToolBar({
+      position: 'RT'
+    }));
+
+    // 添加地图类型切换
+    map.addControl(new AMap.MapType({
+      defaultType: 0,
+      showTraffic: false,
+      position: 'RT'
+    }));
+
+    // 添加鹰眼控件
+    map.addControl(new AMap.ControlBar({
+      position: { right: '10px', bottom: '10px' }
+    }));
   </script>
 </body>
 </html>
