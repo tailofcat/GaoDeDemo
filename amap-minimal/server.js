@@ -56,7 +56,8 @@ app.all('/_AMapService/v4/map/styles/*', (req, res) => {
 });
 
 app.all('/_AMapService/*', (req, res) => {
-  proxyRequest(req, res, 'https://restapi.amap.com', '/_AMapService', { jscode: AMAP_SECURITY_KEY });
+  // Web 服务 API 需要同时添加 key 和 jscode
+  proxyRequest(req, res, 'https://restapi.amap.com', '/_AMapService', { key: AMAP_KEY, jscode: AMAP_SECURITY_KEY });
 });
 
 app.listen(PORT, () => {
