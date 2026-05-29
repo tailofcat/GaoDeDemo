@@ -12,6 +12,11 @@
       margin: 0;
       padding: 0;
     }
+    .amap-control-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
   </style>
 </head>
 <body>
@@ -29,32 +34,19 @@
       center: [116.397428, 39.90923]
     });
 
-    // 添加缩放控件
-    map.addControl(new AMap.Zoom({
-      position: 'RT'
-    }));
+    map.addControl(new AMap.Scale());
+    map.addControl(new AMap.ToolBar());
 
-    // 添加比例尺控件
-    map.addControl(new AMap.Scale({
-      position: 'LB'
-    }));
-
-    // 添加工具条
-    map.addControl(new AMap.ToolBar({
-      position: 'RT'
-    }));
-
-    // 添加地图类型切换
-    map.addControl(new AMap.MapType({
+    var mapType = new AMap.MapType({
       defaultType: 0,
-      showTraffic: false,
-      position: 'RT'
-    }));
+      showTraffic: false
+    });
+    map.addControl(mapType);
 
-    // 添加鹰眼控件
-    map.addControl(new AMap.ControlBar({
-      position: { right: '10px', bottom: '10px' }
-    }));
+    var overView = new AMap.HawkEye({
+      opened: false
+    });
+    map.addControl(overView);
   </script>
 </body>
 </html>
