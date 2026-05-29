@@ -12,11 +12,6 @@
       margin: 0;
       padding: 0;
     }
-    .amap-control-list {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
   </style>
 </head>
 <body>
@@ -34,19 +29,12 @@
       center: [116.397428, 39.90923]
     });
 
-    map.addControl(new AMap.Scale());
-    map.addControl(new AMap.ToolBar());
-
-    var mapType = new AMap.MapType({
-      defaultType: 0,
-      showTraffic: false
+    AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.HawkEye', 'AMap.MapType'], function() {
+      map.addControl(new AMap.Scale());
+      map.addControl(new AMap.ToolBar());
+      map.addControl(new AMap.MapType());
+      map.addControl(new AMap.HawkEye({ isOpen: true }));
     });
-    map.addControl(mapType);
-
-    var overView = new AMap.HawkEye({
-      opened: false
-    });
-    map.addControl(overView);
   </script>
 </body>
 </html>
