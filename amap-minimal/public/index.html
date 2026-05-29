@@ -29,11 +29,20 @@
       center: [116.397428, 39.90923]
     });
 
-    AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.HawkEye', 'AMap.MapType'], function() {
+    AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.HawkEye', 'AMap.MapType', 'AMap.Geolocation'], function() {
       map.addControl(new AMap.Scale());
       map.addControl(new AMap.ToolBar());
       map.addControl(new AMap.MapType());
       map.addControl(new AMap.HawkEye({ isOpen: true }));
+      
+      // 添加定位控件
+      var geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true, // 是否使用高精度定位
+        timeout: 10000,          // 超过10秒后停止定位
+        zoomToAccuracy: true,    // 定位成功后自动调整地图视野
+        buttonPosition: 'RB'     // 定位按钮在右下角
+      });
+      map.addControl(geolocation);
     });
   </script>
 </body>
