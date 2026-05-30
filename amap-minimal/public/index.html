@@ -188,31 +188,45 @@
         return;
       }
 
-      var position = new AMap.LngLat(lng, lat);
+      console.log('[' + new Date().toISOString() + '] 点击定位按钮');
 
-      // 更新面板显示
-      document.getElementById('lng').textContent = lng.toFixed(6);
-      document.getElementById('lat').textContent = lat.toFixed(6);
+      // 定义定位函数
+      function performLocate(count) {
+        console.log('[' + new Date().toISOString() + '] 触发第 ' + count + ' 次定位');
+        
+        var position = new AMap.LngLat(lng, lat);
 
-      // 移除旧标记
-      if (marker) {
-        map.remove(marker);
+        // 更新面板显示
+        document.getElementById('lng').textContent = lng.toFixed(6);
+        document.getElementById('lat').textContent = lat.toFixed(6);
+
+        // 移除旧标记
+        if (marker) {
+          map.remove(marker);
+        }
+
+        // 添加新标记
+        marker = new AMap.Marker({
+          position: position,
+          title: '输入位置'
+        });
+        map.add(marker);
+
+        // 地图中心移到该位置
+        map.setCenter(position);
+        map.setZoom(17);
+
+        // 显示信息窗口
+        infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
+        infoWindow.open(map, position);
       }
 
-      // 添加新标记
-      marker = new AMap.Marker({
-        position: position,
-        title: '输入位置'
-      });
-      map.add(marker);
+      // 立即执行第一次
+      performLocate(1);
 
-      // 地图中心移到该位置
-      map.setCenter(position);
-      map.setZoom(15);
-
-      // 显示信息窗口
-      infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
-      infoWindow.open(map, position);
+      // 间隔1秒执行第2、3次
+      setTimeout(function() { performLocate(2); }, 1000);
+      setTimeout(function() { performLocate(3); }, 2000);
     });
 
     // 支持回车键触发定位
