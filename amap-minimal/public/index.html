@@ -43,6 +43,37 @@
     #info-panel button:hover {
       background: #4096ff;
     }
+    #input-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e8e8e8;
+    }
+    #input-section h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+    }
+    #input-section .input-group {
+      margin-bottom: 8px;
+    }
+    #input-section label {
+      display: inline-block;
+      width: 45px;
+      font-size: 13px;
+    }
+    #input-section input {
+      width: 120px;
+      padding: 5px 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    #input-section input:focus {
+      outline: none;
+      border-color: #1677ff;
+    }
+    #goto-btn {
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -52,6 +83,18 @@
     <p><strong>经度:</strong> <span id="lng">-</span></p>
     <p><strong>纬度:</strong> <span id="lat">-</span></p>
     <button id="clear-btn">清除标记</button>
+    <div id="input-section">
+      <h4>输入坐标定位</h4>
+      <div class="input-group">
+        <label>经度:</label>
+        <input type="number" id="input-lng" step="0.000001" placeholder="116.397428">
+      </div>
+      <div class="input-group">
+        <label>纬度:</label>
+        <input type="number" id="input-lat" step="0.000001" placeholder="39.90923">
+      </div>
+      <button id="goto-btn">定位</button>
+    </div>
   </div>
   <script type="text/javascript">
     window._AMapSecurityConfig = {
@@ -127,6 +170,61 @@
       }
       document.getElementById('lng').textContent = '-';
       document.getElementById('lat').textContent = '-';
+    });
+
+    // 定位按钮
+    document.getElementById('goto-btn').addEventListener('click', function() {
+      var lng = parseFloat(document.getElementById('input-lng').value);
+      var lat = parseFloat(document.getElementById('input-lat').value);
+
+      if (isNaN(lng) || isNaN(lat)) {
+        alert('请输入有效的经纬度坐标');
+        return;
+      }
+
+      // 验证经纬度范围
+      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+        alert('经度范围：-180 到 180，纬度范围：-90 到 90');
+        return;
+      }
+
+      var position = new AMap.LngLat(lng, lat);
+
+      // 更新面板显示
+      document.getElementById('lng').textContent = lng.toFixed(6);
+      document.getElementById('lat').textContent = lat.toFixed(6);
+
+      // 移除旧标记
+      if (marker) {
+        map.remove(marker);
+      }
+
+      // 添加新标记
+      marker = new AMap.Marker({
+        position: position,
+        title: '输入位置'
+      });
+      map.add(marker);
+
+      // 地图中心移到该位置
+      map.setCenter(position);
+      map.setZoom(15);
+
+      // 显示信息窗口
+      infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
+      infoWindow.open(map, position);
+    });
+
+    // 支持回车键触发定位
+    document.getElementById('input-lng').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
+    });
+    document.getElementById('input-lat').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
     });
   </script>
 </body>
