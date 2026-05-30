@@ -157,74 +157,74 @@
         infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
         infoWindow.open(map, e.lnglat);
       });
+    });
 
-      // 清除标记按钮
-      document.getElementById('clear-btn').addEventListener('click', function() {
-        if (marker) {
-          map.remove(marker);
-          marker = null;
-        }
-        if (infoWindow) {
-          infoWindow.close();
-        }
-        document.getElementById('lng').textContent = '-';
-        document.getElementById('lat').textContent = '-';
+    // 清除标记按钮
+    document.getElementById('clear-btn').addEventListener('click', function() {
+      if (marker) {
+        map.remove(marker);
+        marker = null;
+      }
+      if (infoWindow) {
+        infoWindow.close();
+      }
+      document.getElementById('lng').textContent = '-';
+      document.getElementById('lat').textContent = '-';
+    });
+
+    // 定位按钮
+    document.getElementById('goto-btn').addEventListener('click', function() {
+      var lng = parseFloat(document.getElementById('input-lng').value);
+      var lat = parseFloat(document.getElementById('input-lat').value);
+
+      if (isNaN(lng) || isNaN(lat)) {
+        alert('请输入有效的经纬度坐标');
+        return;
+      }
+
+      // 验证经纬度范围
+      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+        alert('经度范围：-180 到 180，纬度范围：-90 到 90');
+        return;
+      }
+
+      var position = new AMap.LngLat(lng, lat);
+
+      // 更新面板显示
+      document.getElementById('lng').textContent = lng.toFixed(6);
+      document.getElementById('lat').textContent = lat.toFixed(6);
+
+      // 移除旧标记
+      if (marker) {
+        map.remove(marker);
+      }
+
+      // 添加新标记
+      marker = new AMap.Marker({
+        position: position,
+        title: '输入位置'
       });
+      map.add(marker);
 
-      // 定位按钮
-      document.getElementById('goto-btn').addEventListener('click', function() {
-        var lng = parseFloat(document.getElementById('input-lng').value);
-        var lat = parseFloat(document.getElementById('input-lat').value);
+      // 地图中心移到该位置
+      map.setCenter(position);
+      map.setZoom(15);
 
-        if (isNaN(lng) || isNaN(lat)) {
-          alert('请输入有效的经纬度坐标');
-          return;
-        }
+      // 显示信息窗口
+      infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
+      infoWindow.open(map, position);
+    });
 
-        // 验证经纬度范围
-        if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
-          alert('经度范围：-180 到 180，纬度范围：-90 到 90');
-          return;
-        }
-
-        var position = new AMap.LngLat(lng, lat);
-
-        // 更新面板显示
-        document.getElementById('lng').textContent = lng.toFixed(6);
-        document.getElementById('lat').textContent = lat.toFixed(6);
-
-        // 移除旧标记
-        if (marker) {
-          map.remove(marker);
-        }
-
-        // 添加新标记
-        marker = new AMap.Marker({
-          position: position,
-          title: '输入位置'
-        });
-        map.add(marker);
-
-        // 地图中心移到该位置
-        map.setCenter(position);
-        map.setZoom(15);
-
-        // 显示信息窗口
-        infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
-        infoWindow.open(map, position);
-      });
-
-      // 支持回车键触发定位
-      document.getElementById('input-lng').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('goto-btn').click();
-        }
-      });
-      document.getElementById('input-lat').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('goto-btn').click();
-        }
-      });
+    // 支持回车键触发定位
+    document.getElementById('input-lng').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
+    });
+    document.getElementById('input-lat').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
     });
   </script>
 </body>
