@@ -48,10 +48,12 @@ async function proxyRequest(req, res, targetBase, stripPrefix, extraParams) {
 }
 
 app.all('/_AMapService/v4/map/styles', (req, res) => {
+  console.log('[' + new Date().toISOString() + '] 收到地图样式请求:', req.query);
   proxyRequest(req, res, 'https://webapi.amap.com', '/v4/map/styles', { jscode: AMAP_SECURITY_KEY });
 });
 
 app.all('/_AMapService/*', (req, res) => {
+  console.log('[' + new Date().toISOString() + '] 收到AMapService请求:', req.path, req.query);
   proxyRequest(req, res, 'https://restapi.amap.com', '/', { jscode: AMAP_SECURITY_KEY });
 });
 
