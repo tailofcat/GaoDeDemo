@@ -51,27 +51,10 @@ app.all('/_AMapService/v4/map/styles', (req, res) => {
   proxyRequest(req, res, 'https://webapi.amap.com', '/v4/map/styles', { jscode: AMAP_SECURITY_KEY });
 });
 
-app.all('/amap/v3/', (req, res) => {
-  proxyRequest(req, res, 'https://webapi.amap.com', '/v3/', { key: AMAP_KEY, jscode: AMAP_SECURITY_KEY });
-});
-
-app.all('/amap/', (req, res) => {
-  proxyRequest(req, res, 'https://webapi.amap.com', '/', { key: AMAP_KEY });
-});
-
 app.all('/_AMapService/*', (req, res) => {
   proxyRequest(req, res, 'https://restapi.amap.com', '/', { jscode: AMAP_SECURITY_KEY });
 });
 
-const server = app.listen(PORT, '127.0.0.1', () => {
-  console.log(`Server running at http://127.0.0.1:${PORT}`);
-});
-
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
-  } else {
-    console.error('Server error:', err);
-  }
-  process.exit(1);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
