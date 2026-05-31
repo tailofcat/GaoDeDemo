@@ -18,8 +18,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 async function proxyRequest(req, res, targetBase, stripPrefix, extraParams) {
   try {
-    const subPath = req.path.slice(stripPrefix.length) || '/';
-    const url = new URL(subPath, targetBase);
+    const subPath = req.path.slice(stripPrefix.length) || '';
+    const targetUrl = targetBase + subPath;
+    const url = new URL(targetUrl);
     for (const [k, v] of Object.entries(req.query)) {
       url.searchParams.set(k, v);
     }
@@ -28,6 +29,8 @@ async function proxyRequest(req, res, targetBase, stripPrefix, extraParams) {
         url.searchParams.set(k, v);
       }
     }
+
+    console.log('[Proxy]', req.method, req.path, '->', url.toString());
 
     const upstream = await fetch(url.toString(), {
       headers: {
@@ -47,12 +50,12 @@ async function proxyRequest(req, res, targetBase, stripPrefix, extraParams) {
   }
 }
 
-app.all('/_AMapService/v4/map/styles', (req, res) => {
-  proxyRequest(req, res, 'https://webapi.amap.com', '/v4/map/styles', { jscode: AMAP_SECURITY_KEY });
+app.all('/_AMapService/v4/map/styles*', (req, res) => {
+  proxyRequest(req, res, 'https://webapi.amap.com/v4/map/styles', '/_AMapService/v4/map/styles', { jscode: AMAP_SECURITY_KEY });
 });
 
 app.all('/_AMapService/*', (req, res) => {
-  proxyRequest(req, res, 'https://restapi.amap.com', '/', { jscode: AMAP_SECURITY_KEY });
+  proxyRequest(req, res, 'https://restapi.amap.com', '/_AMapService', { jscode: AMAP_SECURITY_KEY });
 });
 
 app.listen(PORT, () => {
