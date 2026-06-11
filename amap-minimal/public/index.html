@@ -465,6 +465,7 @@
     var selectedLat = null;
     var historyData = [];
     var historyMarkers = []; // 存储历史记录标记
+    var isFromGotoBtn = false; // 标记是否来自定位按钮
 
     // DOM 元素
     var previewBox = document.getElementById('preview-box');
@@ -546,12 +547,16 @@
 
       // 添加所有历史记录标记
       historyData.forEach(function(item, index) {
+        // 来自定位按钮的用红色标记，其他用蓝色
+        var isRedMarker = item.isFromGotoBtn === true;
+        var markerIcon = isRedMarker ? 'mark_r.png' : 'mark_b.png';
+        var markerTitle = isRedMarker ? '定位位置 ' + (index + 1) : '历史位置 ' + (index + 1);
         var historyMarker = new AMap.Marker({
           position: [item.lng, item.lat],
-          title: '历史位置 ' + (index + 1),
+          title: markerTitle,
           icon: new AMap.Icon({
             size: new AMap.Size(20, 28),
-            image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+            image: 'https://webapi.amap.com/theme/v1.3/markers/n/' + markerIcon,
             imageSize: new AMap.Size(20, 28)
           })
         });
@@ -694,19 +699,23 @@
       initPreviewMap(selectedLng, selectedLat);
       previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
 
-      // 添加到历史记录
-      addToHistory(selectedLng, selectedLat);
+      // 添加到历史记录（地图点击选点，不是来自定位按钮）
+      addToHistory(selectedLng, selectedLat, isFromGotoBtn);
+
+      // 重置标记
+      isFromGotoBtn = false;
 
       // 关闭弹窗
       closeModal();
     }
 
     // 添加到历史记录
-    function addToHistory(lng, lat) {
+    function addToHistory(lng, lat, fromGotoBtn) {
       var record = {
         lng: lng,
         lat: lat,
-        time: new Date().toLocaleString('zh-CN')
+        time: new Date().toLocaleString('zh-CN'),
+        isFromGotoBtn: fromGotoBtn === true
       };
       historyData.unshift(record);
       renderHistory();
@@ -778,6 +787,9 @@
       lngInput.value = lng;
       latInput.value = lat;
 
+      // 标记为来自定位按钮
+      isFromGotoBtn = true;
+
       // 打开地图弹窗并显示红色标记
       openModal();
     });
@@ -795,7 +807,11 @@
     });
 
     // 事件绑定
-    previewBox.addEventListener('click', openModal);
+    previewBox.addEventListener('click', function() {
+      // 预览框点击不是来自定位按钮
+      isFromGotoBtn = false;
+      openModal();
+    });
     modalClose.addEventListener('click', closeModal);
     btnCancel.addEventListener('click', closeModal);
     btnConfirm.addEventListener('click', confirmSelection);
