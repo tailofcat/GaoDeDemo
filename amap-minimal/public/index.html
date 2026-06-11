@@ -400,9 +400,20 @@
         </div>
       </div>
 
-      <!-- 输入坐标定位 -->
-      <div class="input-section">
-        <h4>输入坐标定位</h4>
+    </div>
+
+    <!-- 历史记录区域 -->
+    <div class="history-section">
+      <div class="section-title">已选位置记录</div>
+      <div class="history-list" id="history-list">
+        <div class="empty-history">暂无选点记录</div>
+      </div>
+    </div>
+
+    <!-- 输入坐标定位 -->
+    <div class="map-picker-section">
+      <div class="section-title">输入坐标定位</div>
+      <div class="input-section" style="border-top: none; margin-top: 0; padding-top: 0;">
         <div class="input-group">
           <label>经度:</label>
           <input type="number" id="input-lng" step="0.000001" placeholder="116.397428">
@@ -412,14 +423,6 @@
           <input type="number" id="input-lat" step="0.000001" placeholder="39.90923">
         </div>
         <button class="btn btn-confirm" id="goto-btn" style="width: 100%;">定位</button>
-      </div>
-    </div>
-
-    <!-- 历史记录区域 -->
-    <div class="history-section">
-      <div class="section-title">已选位置记录</div>
-      <div class="history-list" id="history-list">
-        <div class="empty-history">暂无选点记录</div>
       </div>
     </div>
   </div>
