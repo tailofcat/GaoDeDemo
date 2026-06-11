@@ -486,9 +486,8 @@
         center: [116.397428, 39.90923]
       });
 
-      AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.MapType', 'AMap.Geolocation', 'AMap.InfoWindow'], function() {
+      AMap.plugin(['AMap.Scale', 'AMap.MapType', 'AMap.Geolocation', 'AMap.InfoWindow'], function() {
         map.addControl(new AMap.Scale());
-        map.addControl(new AMap.ToolBar());
         map.addControl(new AMap.MapType());
 
         // 添加定位控件
