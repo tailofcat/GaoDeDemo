@@ -44,7 +44,7 @@
     /* 预览框 */
     .preview-box {
       width: 100%;
-      height: 150px;
+      height: 180px;
       border: 2px dashed #d9d9d9;
       border-radius: 8px;
       display: flex;
@@ -54,6 +54,8 @@
       cursor: pointer;
       transition: all 0.3s;
       background: #fafafa;
+      position: relative;
+      overflow: hidden;
     }
     
     .preview-box:hover {
@@ -65,6 +67,7 @@
       border-style: solid;
       border-color: #52c41a;
       background: #f6ffed;
+      padding: 0;
     }
     
     .preview-icon {
@@ -81,6 +84,29 @@
       font-size: 13px;
       color: #52c41a;
       margin-top: 8px;
+      font-family: monospace;
+    }
+    
+    /* 预览框中的静态地图 */
+    .preview-map {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    
+    .preview-map-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      padding: 30px 12px 12px;
+      color: white;
+    }
+    
+    .preview-map-coords {
+      font-size: 13px;
       font-family: monospace;
     }
     
@@ -317,9 +343,16 @@
     <div class="map-picker-section">
       <div class="section-title">地图选点</div>
       <div class="preview-box" id="preview-box">
-        <div class="preview-icon">📍</div>
-        <div class="preview-text">点击选择地图位置</div>
-        <div class="preview-coords" id="preview-coords" style="display: none;"></div>
+        <div class="preview-empty" id="preview-empty">
+          <div class="preview-icon">📍</div>
+          <div class="preview-text">点击选择地图位置</div>
+        </div>
+        <div class="preview-content" id="preview-content" style="display: none;">
+          <img class="preview-map" id="preview-map-img" src="" alt="地图位置">
+          <div class="preview-map-overlay">
+            <div class="preview-map-coords" id="preview-map-coords"></div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -372,7 +405,10 @@
     
     // DOM 元素
     var previewBox = document.getElementById('preview-box');
-    var previewCoords = document.getElementById('preview-coords');
+    var previewEmpty = document.getElementById('preview-empty');
+    var previewContent = document.getElementById('preview-content');
+    var previewMapImg = document.getElementById('preview-map-img');
+    var previewMapCoords = document.getElementById('preview-map-coords');
     var mapModal = document.getElementById('map-modal');
     var modalClose = document.getElementById('modal-close');
     var btnCancel = document.getElementById('btn-cancel');
@@ -466,14 +502,30 @@
       }
     }
     
+    // 生成静态地图图片URL
+    function generateStaticMapUrl(lng, lat) {
+      var width = 800;
+      var height = 360;
+      var zoom = 15;
+      var key = '3a8f7c80daf5e3f05cd014c06de9eaab';
+      return 'https://restapi.amap.com/v3/staticmap?location=' + lng + ',' + lat + 
+             '&zoom=' + zoom + '&size=' + width + '*' + height + 
+             '&markers=mid,,A:' + lng + ',' + lat +
+             '&key=' + key;
+    }
+    
     // 确认选点
     function confirmSelection() {
       if (selectedLng === null || selectedLat === null) return;
       
       // 更新预览框
       previewBox.classList.add('has-location');
-      previewCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
-      previewCoords.style.display = 'block';
+      previewEmpty.style.display = 'none';
+      previewContent.style.display = 'block';
+      
+      // 设置静态地图图片
+      previewMapImg.src = generateStaticMapUrl(selectedLng, selectedLat);
+      previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
       
       // 添加到历史记录
       addToHistory(selectedLng, selectedLat);
@@ -520,8 +572,10 @@
     window.useHistory = function(index) {
       var item = historyData[index];
       previewBox.classList.add('has-location');
-      previewCoords.textContent = '经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6);
-      previewCoords.style.display = 'block';
+      previewEmpty.style.display = 'none';
+      previewContent.style.display = 'block';
+      previewMapImg.src = generateStaticMapUrl(item.lng, item.lat);
+      previewMapCoords.textContent = '经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6);
     };
     
     // 删除历史记录
