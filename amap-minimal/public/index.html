@@ -522,9 +522,32 @@
         zoom: 15,
         center: [lng, lat],
         dragEnable: false,
-        zoomEnable: false,
+        zoomEnable: true,
         doubleClickZoom: false,
         keyboardEnable: false
+      });
+      
+      // 添加缩放控件到左侧中间
+      AMap.plugin(['AMap.ToolBar'], function() {
+        var toolBar = new AMap.ToolBar({
+          position: 'LB',
+          offset: new AMap.Pixel(10, 0),
+          zoomInTitle: '放大',
+          zoomOutTitle: '缩小'
+        });
+        previewMap.addControl(toolBar);
+        
+        // 自定义缩放控件样式和位置
+        setTimeout(function() {
+          var zoomCtrl = document.querySelector('.amap-toolbar');
+          if (zoomCtrl) {
+            zoomCtrl.style.left = '10px';
+            zoomCtrl.style.bottom = '50%';
+            zoomCtrl.style.transform = 'translateY(50%)';
+            zoomCtrl.style.right = 'auto';
+            zoomCtrl.style.top = 'auto';
+          }
+        }, 100);
       });
       
       // 添加标记
