@@ -4,831 +4,114 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
-  <title>地图选点组件</title>
+  <title>AmapPicker 演示</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     html, body {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: #f5f5f5;
     }
-
-    /* 主容器 */
-    .main-container {
+    .demo-container {
       max-width: 800px;
       margin: 50px auto;
       padding: 20px;
     }
-
-    /* 地图选点区域 */
-    .map-picker-section {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .demo-title {
+      text-align: center;
+      font-size: 20px;
+      color: #333;
       margin-bottom: 20px;
     }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    /* 预览框 */
-    .preview-box {
-      width: 100%;
-      height: 180px;
-      border: 2px dashed #d9d9d9;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: #fafafa;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .preview-box:hover {
-      border-color: #1677ff;
-      background: #f0f7ff;
-    }
-
-    .preview-box.has-location {
-      border-style: solid;
-      border-color: #52c41a;
-      background: #f6ffed;
-      padding: 0;
-    }
-
-    .preview-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .preview-text {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .preview-coords {
-      font-size: 13px;
-      color: #52c41a;
-      margin-top: 8px;
-      font-family: monospace;
-    }
-
-    /* 预览框中的地图 */
-    .preview-content {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .preview-map-container {
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-    }
-
-    .preview-map-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      padding: 30px 12px 12px;
-      color: white;
-      z-index: 10;
-    }
-
-    .preview-map-coords {
-      font-size: 13px;
-      font-family: monospace;
-    }
-
-    /* 历史记录区域 */
-    .history-section {
+    .demo-events {
       background: white;
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
-
-    .history-list {
-      max-height: 300px;
+    .demo-events h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #333;
+    }
+    .demo-log {
+      max-height: 200px;
       overflow-y: auto;
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background 0.2s;
-    }
-
-    .history-item:hover {
-      background: #f5f5f5;
-    }
-
-    .history-item:last-child {
-      border-bottom: none;
-    }
-
-    .history-coords {
       font-family: monospace;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .history-time {
       font-size: 12px;
-      color: #999;
-    }
-
-    .history-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-small {
-      padding: 4px 12px;
-      font-size: 12px;
-      border: none;
+      color: #666;
+      background: #f9f9f9;
+      padding: 10px;
       border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
     }
-
-    .btn-use {
-      background: #1677ff;
-      color: white;
-    }
-
-    .btn-use:hover {
-      background: #4096ff;
-    }
-
-    .btn-delete {
-      background: #ff4d4f;
-      color: white;
-    }
-
-    .btn-delete:hover {
-      background: #ff7875;
-    }
-
-    .empty-history {
-      text-align: center;
-      color: #999;
-      padding: 40px;
-      font-size: 14px;
-    }
-
-    /* 弹窗遮罩 */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    /* 弹窗内容 */
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 900px;
-      height: 80%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
+    .demo-log div {
+      padding: 2px 0;
       border-bottom: 1px solid #f0f0f0;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border: none;
-      background: #f5f5f5;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 18px;
-      color: #666;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close:hover {
-      background: #e8e8e8;
-      color: #333;
-    }
-
-    .modal-body {
-      flex: 1;
-      position: relative;
-    }
-
-    #map-container {
-      width: 100%;
-      height: 100%;
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-top: 1px solid #f0f0f0;
-      background: #fafafa;
-    }
-
-    .selected-info {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .selected-info .coords {
-      color: #1677ff;
-      font-weight: 600;
-      font-family: monospace;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 8px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .btn-cancel {
-      background: #f5f5f5;
-      color: #666;
-    }
-
-    .btn-cancel:hover {
-      background: #e8e8e8;
-    }
-
-    .btn-confirm {
-      background: #1677ff;
-      color: white;
-    }
-
-    .btn-confirm:hover {
-      background: #4096ff;
-    }
-
-    .btn-confirm:disabled {
-      background: #d9d9d9;
-      cursor: not-allowed;
-    }
-
-    /* 输入区域 */
-    .input-section {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #e8e8e8;
-    }
-
-    .input-section h4 {
-      margin: 0 0 10px 0;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .input-group label {
-      font-size: 13px;
-      color: #666;
-      min-width: 45px;
-      line-height: 32px;
-    }
-
-    .input-group input {
-      flex: 1;
-      padding: 6px 10px;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      font-size: 13px;
-    }
-
-    .input-group input:focus {
-      outline: none;
-      border-color: #1677ff;
-    }
-
-    /* 提示信息 */
-    .map-tip {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      z-index: 10;
-      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div class="main-container">
-    <!-- 输入坐标定位 -->
-    <div class="map-picker-section">
-      <div class="section-title">规划站点坐标</div>
-      <div class="input-section" style="border-top: none; margin-top: 0; padding-top: 0;">
-        <div class="input-group">
-          <label>经度:</label>
-          <input type="number" id="input-lng" step="0.000001" placeholder="113.337680">
-        </div>
-        <div class="input-group">
-          <label>纬度:</label>
-          <input type="number" id="input-lat" step="0.000001" placeholder="23.141447">
-        </div>
-        <button class="btn btn-confirm" id="goto-btn" style="width: 100%;">定位</button>
-      </div>
-    </div>
+  <div class="demo-container">
+    <div class="demo-title">AmapPicker 地图选点组件演示</div>
 
-    <!-- 地图选点区域 -->
-    <div class="map-picker-section">
-      <div class="section-title">选址地图</div>
-      <div style="font-size: 13px; color: #666; margin-bottom: 10px;">点击地图插入候选站点</div>
-      <div class="preview-box" id="preview-box">
-        <div class="preview-empty" id="preview-empty">
-          <div class="preview-icon">📍</div>
-          <div class="preview-text">点击选择地图位置</div>
-        </div>
-        <div class="preview-content" id="preview-content" style="display: none;">
-          <div id="preview-map-container" class="preview-map-container"></div>
-          <div class="preview-map-overlay">
-            <div class="preview-map-coords" id="preview-map-coords"></div>
-          </div>
-        </div>
-      </div>
+    <!-- 组件挂载点 -->
+    <div id="amap-picker-mount"></div>
 
-      <!-- 历史记录区域 -->
-      <div class="section-title" style="margin-top: 20px;">已选位置记录</div>
-      <div class="history-list" id="history-list">
-        <div class="empty-history">暂无选点记录</div>
-      </div>
+    <!-- 事件日志 -->
+    <div class="demo-events">
+      <h3>事件日志</h3>
+      <div class="demo-log" id="event-log"></div>
     </div>
   </div>
 
-  <!-- 地图弹窗 -->
-  <div class="modal-overlay" id="map-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">选择地图位置</div>
-        <button class="modal-close" id="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="map-tip">点击地图任意位置选点</div>
-        <div id="map-container"></div>
-      </div>
-      <div class="modal-footer">
-        <div class="selected-info">
-          当前选择：<span class="coords" id="selected-coords">未选择</span>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-cancel" id="btn-cancel">取消</button>
-          <button class="btn btn-confirm" id="btn-confirm" disabled>确认</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-    window._AMapSecurityConfig = {
-      serviceHost: "http://localhost:3001/_AMapService"
-    };
-  </script>
-  <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=3a8f7c80daf5e3f05cd014c06de9eaab"></script>
-  <script type="text/javascript">
-    // 全局变量
-    var map = null;
-    var marker = null;
-    var infoWindow = null;
-    var selectedLng = null;
-    var selectedLat = null;
-    var historyData = [];
-    var historyMarkers = []; // 存储历史记录标记
-    var isFromGotoBtn = false; // 标记是否来自定位按钮
-
-    // DOM 元素
-    var previewBox = document.getElementById('preview-box');
-    var previewEmpty = document.getElementById('preview-empty');
-    var previewContent = document.getElementById('preview-content');
-    var previewMapCoords = document.getElementById('preview-map-coords');
-    var mapModal = document.getElementById('map-modal');
-    var modalClose = document.getElementById('modal-close');
-    var btnCancel = document.getElementById('btn-cancel');
-    var btnConfirm = document.getElementById('btn-confirm');
-    var selectedCoords = document.getElementById('selected-coords');
-    var historyList = document.getElementById('history-list');
-
-    // 预览地图实例
-    var previewMap = null;
-    var previewMarker = null;
-
-    // 初始化地图
-    function initMap() {
-      map = new AMap.Map('map-container', {
-        viewMode: '2D',
-        zoom: 18,
-        center: [113.337680, 23.141447]
-      });
-
-      AMap.plugin(['AMap.Scale', 'AMap.MapType', 'AMap.Geolocation', 'AMap.InfoWindow'], function() {
-        map.addControl(new AMap.Scale());
-        map.addControl(new AMap.MapType());
-
-        // 添加定位控件
-        var geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true,
-          timeout: 10000,
-          zoomToAccuracy: true,
-          buttonPosition: 'RB'
-        });
-        map.addControl(geolocation);
-
-        // 创建信息窗口
-        infoWindow = new AMap.InfoWindow({
-          offset: new AMap.Pixel(0, -30)
-        });
-
-        // 绑定地图点击事件
-        map.on('click', function(e) {
-          selectedLng = e.lnglat.getLng();
-          selectedLat = e.lnglat.getLat();
-
-          // 更新选中信息显示
-          selectedCoords.textContent = selectedLng.toFixed(6) + ', ' + selectedLat.toFixed(6);
-          btnConfirm.disabled = false;
-
-          // 移除旧标记
-          if (marker) {
-            map.remove(marker);
-          }
-
-          // 添加新标记
-          marker = new AMap.Marker({
-            position: e.lnglat,
-            title: '选点位置'
-          });
-          map.add(marker);
-
-          // 显示信息窗口
-          infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + selectedLng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + selectedLat.toFixed(6) + '</p></div>');
-          infoWindow.open(map, e.lnglat);
-        });
-      });
-    }
-
-    // 显示所有历史记录标记
-    function showHistoryMarkers() {
-      // 清除旧的历史标记
-      historyMarkers.forEach(function(m) {
-        map.remove(m);
-      });
-      historyMarkers = [];
-
-      // 添加所有历史记录标记
-      historyData.forEach(function(item, index) {
-        // 来自定位按钮的用红色标记，其他用蓝色
-        var isRedMarker = item.isFromGotoBtn === true;
-        var markerIcon = isRedMarker ? 'mark_r.png' : 'mark_b.png';
-        var markerTitle = isRedMarker ? '定位位置 ' + (index + 1) : '历史位置 ' + (index + 1);
-        var historyMarker = new AMap.Marker({
-          position: [item.lng, item.lat],
-          title: markerTitle,
-          icon: new AMap.Icon({
-            size: new AMap.Size(20, 28),
-            image: 'https://webapi.amap.com/theme/v1.3/markers/n/' + markerIcon,
-            imageSize: new AMap.Size(20, 28)
-          })
-        });
-        map.add(historyMarker);
-        historyMarkers.push(historyMarker);
-      });
-    }
-
-    // 打开弹窗
-    function openModal() {
-      mapModal.classList.add('active');
-
-      // 获取输入框中的坐标
-      var inputLng = parseFloat(document.getElementById('input-lng').value);
-      var inputLat = parseFloat(document.getElementById('input-lat').value);
-
-      // 延迟初始化地图，确保容器已显示
-      if (!map) {
-        setTimeout(function() {
-          initMap();
-          // 显示所有历史记录标记
-          setTimeout(function() {
-            showHistoryMarkers();
-          }, 200);
-          // 如果输入了有效坐标，在地图上显示红色标记
-          if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
-            setTimeout(function() {
-              showMarkerOnMap(inputLng, inputLat);
-            }, 300);
-          }
-        }, 100);
-      } else {
-        setTimeout(function() {
-          map.resize();
-          // 显示所有历史记录标记
-          showHistoryMarkers();
-          // 如果输入了有效坐标，在地图上显示红色标记
-          if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
-            showMarkerOnMap(inputLng, inputLat);
-          }
-        }, 100);
-      }
-    }
-
-    // 在地图上显示红色标记
-    function showMarkerOnMap(lng, lat) {
-      var position = new AMap.LngLat(lng, lat);
-
-      // 更新选中信息显示
-      selectedLng = lng;
-      selectedLat = lat;
-      selectedCoords.textContent = lng.toFixed(6) + ', ' + lat.toFixed(6);
-      btnConfirm.disabled = false;
-
-      // 移除旧标记
-      if (marker) {
-        map.remove(marker);
-      }
-
-      // 添加红色标记
-      marker = new AMap.Marker({
-        position: position,
-        title: '定位位置',
-        icon: new AMap.Icon({
-          size: new AMap.Size(25, 34),
-          image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
-          imageSize: new AMap.Size(25, 34)
-        })
-      });
-      map.add(marker);
-
-      // 地图中心移到该位置
-      map.setCenter(position);
-      map.setZoom(18);
-
-      // 显示信息窗口
-      infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
-      infoWindow.open(map, position);
-    }
-
-    // 关闭弹窗
-    function closeModal() {
-      mapModal.classList.remove('active');
-      selectedLng = null;
-      selectedLat = null;
-      selectedCoords.textContent = '未选择';
-      btnConfirm.disabled = true;
-
-      if (marker) {
-        map.remove(marker);
-        marker = null;
-      }
-      if (infoWindow) {
-        infoWindow.close();
-      }
-      // 清除历史标记
-      historyMarkers.forEach(function(m) {
-        map.remove(m);
-      });
-      historyMarkers = [];
-    }
-
-    // 初始化预览地图
-    function initPreviewMap(lng, lat) {
-      if (previewMap) {
-        previewMap.destroy();
-      }
-
-      previewMap = new AMap.Map('preview-map-container', {
-        viewMode: '2D',
-        zoom: 18,
-        center: [lng, lat],
-        dragEnable: false,
-        zoomEnable: false,
-        doubleClickZoom: false,
-        keyboardEnable: false
-      });
-
-      // 添加所有历史记录标记到预览地图
-      historyData.forEach(function(item) {
-        var isRedMarker = item.isFromGotoBtn === true;
-        var markerIcon = isRedMarker ? 'mark_r.png' : 'mark_b.png';
-        var markerTitle = isRedMarker ? '定位位置' : '历史位置';
-        var historyMarker = new AMap.Marker({
-          position: [item.lng, item.lat],
-          title: markerTitle,
-          icon: new AMap.Icon({
-            size: new AMap.Size(20, 28),
-            image: 'https://webapi.amap.com/theme/v1.3/markers/n/' + markerIcon,
-            imageSize: new AMap.Size(20, 28)
-          })
-        });
-        historyMarker.setMap(previewMap);
-      });
-    }
-
-    // 确认选点
-    function confirmSelection() {
-      if (selectedLng === null || selectedLat === null) return;
-
-      // 更新预览框
-      previewBox.classList.add('has-location');
-      previewEmpty.style.display = 'none';
-      previewContent.style.display = 'block';
-
-      // 先添加到历史记录
-      addToHistory(selectedLng, selectedLat, isFromGotoBtn);
-
-      // 重置标记
-      isFromGotoBtn = false;
-
-      // 初始化预览地图（包含所有历史标记）
-      initPreviewMap(selectedLng, selectedLat);
-      previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
-
-      // 关闭弹窗
-      closeModal();
-    }
-
-    // 添加到历史记录
-    function addToHistory(lng, lat, fromGotoBtn) {
-      var record = {
-        lng: lng,
-        lat: lat,
-        time: new Date().toLocaleString('zh-CN'),
-        isFromGotoBtn: fromGotoBtn === true
-      };
-      historyData.unshift(record);
-      renderHistory();
-    }
-
-    // 渲染历史记录
-    function renderHistory() {
-      if (historyData.length === 0) {
-        historyList.innerHTML = '<div class="empty-history">暂无选点记录</div>';
-        return;
-      }
-
-      var html = '';
-      historyData.forEach(function(item, index) {
-        html += '<div class="history-item">' +
-          '<div>' +
-            '<div class="history-coords">经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6) + '</div>' +
-            '<div class="history-time">' + item.time + '</div>' +
-          '</div>' +
-          '<div class="history-actions">' +
-            '<button class="btn-small btn-use" onclick="useHistory(' + index + ')">使用</button>' +
-            '<button class="btn-small btn-delete" onclick="deleteHistory(' + index + ')">删除</button>' +
-          '</div>' +
-        '</div>';
-      });
-      historyList.innerHTML = html;
-    }
-
-    // 使用历史记录
-    window.useHistory = function(index) {
-      var item = historyData[index];
-      previewBox.classList.add('has-location');
-      previewEmpty.style.display = 'none';
-      previewContent.style.display = 'block';
-      initPreviewMap(item.lng, item.lat);
-      previewMapCoords.textContent = '经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6);
-    };
-
-    // 删除历史记录
-    window.deleteHistory = function(index) {
-      historyData.splice(index, 1);
-      renderHistory();
-    };
-
-    // 定位按钮功能
-    document.getElementById('goto-btn').addEventListener('click', function() {
-      var lngInput = document.getElementById('input-lng');
-      var latInput = document.getElementById('input-lat');
-
-      // 如果没有输入值，使用 placeholder 作为默认值
-      var lngValue = lngInput.value || lngInput.placeholder;
-      var latValue = latInput.value || latInput.placeholder;
-
-      var lng = parseFloat(lngValue);
-      var lat = parseFloat(latValue);
-
-      if (isNaN(lng) || isNaN(lat)) {
-        alert('请输入有效的经纬度坐标');
-        return;
-      }
-
-      // 验证经纬度范围
-      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
-        alert('经度范围：-180 到 180，纬度范围：-90 到 90');
-        return;
-      }
-
-      // 将值回填到输入框
-      lngInput.value = lng;
-      latInput.value = lat;
-
-      // 标记为来自定位按钮
-      isFromGotoBtn = true;
-
-      // 打开地图弹窗并显示红色标记
-      openModal();
-    });
-
-    // 支持回车键触发定位
-    document.getElementById('input-lng').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('goto-btn').click();
-      }
-    });
-    document.getElementById('input-lat').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('goto-btn').click();
+  <script src="/src/amap-picker.js"></script>
+  <script>
+    // 初始化 AmapPicker
+    var picker = new AmapPicker({
+      container: '#amap-picker-mount',
+      apiKey: '3a8f7c80daf5e3f05cd014c06de9eaab',
+      securityHost: 'http://localhost:3001/_AMapService',
+      defaultCenter: [113.337680, 23.141447],
+      defaultZoom: 18,
+      placeholder: {
+        lng: '113.337680',
+        lat: '23.141447'
       }
     });
 
-    // 事件绑定
-    previewBox.addEventListener('click', function() {
-      // 预览框点击不是来自定位按钮
-      isFromGotoBtn = false;
-      openModal();
-    });
-    modalClose.addEventListener('click', closeModal);
-    btnCancel.addEventListener('click', closeModal);
-    btnConfirm.addEventListener('click', confirmSelection);
+    // 事件日志
+    var logEl = document.getElementById('event-log');
 
-    // 点击遮罩关闭
-    mapModal.addEventListener('click', function(e) {
-      if (e.target === mapModal) {
-        closeModal();
-      }
+    function addLog(eventName, data) {
+      var div = document.createElement('div');
+      div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + eventName + ': ' + JSON.stringify(data);
+      logEl.insertBefore(div, logEl.firstChild);
+    }
+
+    picker.on('select', function (data) {
+      addLog('select', data);
+    });
+
+    picker.on('confirm', function (data) {
+      addLog('confirm', data);
+    });
+
+    picker.on('open', function () {
+      addLog('open', {});
+    });
+
+    picker.on('close', function () {
+      addLog('close', {});
+    });
+
+    picker.on('historyChange', function (data) {
+      addLog('historyChange', data.length + ' records');
+    });
+
+    picker.on('error', function (err) {
+      addLog('error', err.message);
     });
   </script>
 </body>

@@ -1,60 +1,26 @@
 require('dotenv').config();
 
-const express = require('express');
-const path = require('path');
+var express = require('express');
+var path = require('path');
+var { createAmapProxy } = require('./src/proxy-middleware');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+var app = express();
+var PORT = process.env.PORT || 3001;
 
-const AMAP_KEY = process.env.AMAP_KEY;
-const AMAP_SECURITY_KEY = process.env.AMAP_SECURITY_KEY;
+var AMAP_KEY = process.env.AMAP_KEY;
+var AMAP_SECURITY_KEY = process.env.AMAP_SECURITY_KEY;
 
 if (!AMAP_KEY || !AMAP_SECURITY_KEY) {
   console.error('Error: AMAP_KEY and AMAP_SECURITY_KEY must be set in .env');
   process.exit(1);
 }
 
+// 静态文件
 app.use(express.static(path.join(__dirname, 'public')));
 
-async function proxyRequest(req, res, targetBase, stripPrefix, extraParams) {
-  try {
-    const subPath = req.path.slice(stripPrefix.length) || '/';
-    const url = new URL(subPath, targetBase);
-    for (const [k, v] of Object.entries(req.query)) {
-      url.searchParams.set(k, v);
-    }
-    for (const [k, v] of Object.entries(extraParams)) {
-      if (!url.searchParams.has(k)) {
-        url.searchParams.set(k, v);
-      }
-    }
+// 高德地图反向代理
+app.use('/_AMapService', createAmapProxy({ securityKey: AMAP_SECURITY_KEY }));
 
-    const upstream = await fetch(url.toString(), {
-      headers: {
-        'User-Agent': req.get('user-agent') || '',
-        'Referer': req.get('referer') || '',
-      },
-    });
-
-    const contentType = upstream.headers.get('content-type') || '';
-    res.set('Content-Type', contentType);
-    res.status(upstream.status);
-    const body = await upstream.text();
-    res.send(body);
-  } catch (err) {
-    console.error('Proxy error:', err.message);
-    res.status(502).send('Bad Gateway');
-  }
-}
-
-app.all('/_AMapService/v4/map/styles', (req, res) => {
-  proxyRequest(req, res, 'https://webapi.amap.com', '/v4/map/styles', { jscode: AMAP_SECURITY_KEY });
-});
-
-app.all('/_AMapService/*', (req, res) => {
-  proxyRequest(req, res, 'https://restapi.amap.com', '/', { jscode: AMAP_SECURITY_KEY });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(PORT, function () {
+  console.log('Server running at http://localhost:' + PORT);
 });
