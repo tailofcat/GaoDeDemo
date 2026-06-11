@@ -17,6 +17,7 @@ if (!AMAP_KEY || !AMAP_SECURITY_KEY) {
 
 // 静态文件
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/src', express.static(path.join(__dirname, 'src')));
 
 // 高德地图反向代理
 app.use('/_AMapService', createAmapProxy({ securityKey: AMAP_SECURITY_KEY }));
