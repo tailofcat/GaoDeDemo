@@ -702,15 +702,15 @@
       previewEmpty.style.display = 'none';
       previewContent.style.display = 'block';
 
-      // 初始化预览地图
-      initPreviewMap(selectedLng, selectedLat);
-      previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
-
-      // 添加到历史记录（地图点击选点，不是来自定位按钮）
+      // 先添加到历史记录
       addToHistory(selectedLng, selectedLat, isFromGotoBtn);
 
       // 重置标记
       isFromGotoBtn = false;
+
+      // 初始化预览地图（包含所有历史标记）
+      initPreviewMap(selectedLng, selectedLat);
+      previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
 
       // 关闭弹窗
       closeModal();
