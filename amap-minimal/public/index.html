@@ -17,14 +17,14 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: #f5f5f5;
     }
-    
+
     /* 主容器 */
     .main-container {
       max-width: 800px;
       margin: 50px auto;
       padding: 20px;
     }
-    
+
     /* 地图选点区域 */
     .map-picker-section {
       background: white;
@@ -33,14 +33,14 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 20px;
     }
-    
+
     .section-title {
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 15px;
       color: #333;
     }
-    
+
     /* 预览框 */
     .preview-box {
       width: 100%;
@@ -57,49 +57,49 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .preview-box:hover {
       border-color: #1677ff;
       background: #f0f7ff;
     }
-    
+
     .preview-box.has-location {
       border-style: solid;
       border-color: #52c41a;
       background: #f6ffed;
       padding: 0;
     }
-    
+
     .preview-icon {
       font-size: 32px;
       margin-bottom: 8px;
     }
-    
+
     .preview-text {
       color: #666;
       font-size: 14px;
     }
-    
+
     .preview-coords {
       font-size: 13px;
       color: #52c41a;
       margin-top: 8px;
       font-family: monospace;
     }
-    
+
     /* 预览框中的地图 */
     .preview-content {
       width: 100%;
       height: 100%;
       position: relative;
     }
-    
+
     .preview-map-container {
       width: 100%;
       height: 100%;
       border-radius: 6px;
     }
-    
+
     .preview-map-overlay {
       position: absolute;
       bottom: 0;
@@ -110,12 +110,12 @@
       color: white;
       z-index: 10;
     }
-    
+
     .preview-map-coords {
       font-size: 13px;
       font-family: monospace;
     }
-    
+
     /* 历史记录区域 */
     .history-section {
       background: white;
@@ -123,12 +123,12 @@
       padding: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    
+
     .history-list {
       max-height: 300px;
       overflow-y: auto;
     }
-    
+
     .history-item {
       display: flex;
       justify-content: space-between;
@@ -137,31 +137,31 @@
       border-bottom: 1px solid #f0f0f0;
       transition: background 0.2s;
     }
-    
+
     .history-item:hover {
       background: #f5f5f5;
     }
-    
+
     .history-item:last-child {
       border-bottom: none;
     }
-    
+
     .history-coords {
       font-family: monospace;
       font-size: 13px;
       color: #333;
     }
-    
+
     .history-time {
       font-size: 12px;
       color: #999;
     }
-    
+
     .history-actions {
       display: flex;
       gap: 8px;
     }
-    
+
     .btn-small {
       padding: 4px 12px;
       font-size: 12px;
@@ -170,32 +170,32 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    
+
     .btn-use {
       background: #1677ff;
       color: white;
     }
-    
+
     .btn-use:hover {
       background: #4096ff;
     }
-    
+
     .btn-delete {
       background: #ff4d4f;
       color: white;
     }
-    
+
     .btn-delete:hover {
       background: #ff7875;
     }
-    
+
     .empty-history {
       text-align: center;
       color: #999;
       padding: 40px;
       font-size: 14px;
     }
-    
+
     /* 弹窗遮罩 */
     .modal-overlay {
       display: none;
@@ -209,11 +209,11 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     .modal-overlay.active {
       display: flex;
     }
-    
+
     /* 弹窗内容 */
     .modal-content {
       background: white;
@@ -226,7 +226,7 @@
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
-    
+
     .modal-header {
       display: flex;
       justify-content: space-between;
@@ -234,13 +234,13 @@
       padding: 16px 20px;
       border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .modal-title {
       font-size: 16px;
       font-weight: 600;
       color: #333;
     }
-    
+
     .modal-close {
       width: 32px;
       height: 32px;
@@ -254,22 +254,22 @@
       align-items: center;
       justify-content: center;
     }
-    
+
     .modal-close:hover {
       background: #e8e8e8;
       color: #333;
     }
-    
+
     .modal-body {
       flex: 1;
       position: relative;
     }
-    
+
     #map-container {
       width: 100%;
       height: 100%;
     }
-    
+
     .modal-footer {
       display: flex;
       justify-content: space-between;
@@ -278,23 +278,23 @@
       border-top: 1px solid #f0f0f0;
       background: #fafafa;
     }
-    
+
     .selected-info {
       font-size: 14px;
       color: #666;
     }
-    
+
     .selected-info .coords {
       color: #1677ff;
       font-weight: 600;
       font-family: monospace;
     }
-    
+
     .modal-actions {
       display: flex;
       gap: 12px;
     }
-    
+
     .btn {
       padding: 8px 20px;
       border: none;
@@ -303,30 +303,69 @@
       font-size: 14px;
       transition: all 0.2s;
     }
-    
+
     .btn-cancel {
       background: #f5f5f5;
       color: #666;
     }
-    
+
     .btn-cancel:hover {
       background: #e8e8e8;
     }
-    
+
     .btn-confirm {
       background: #1677ff;
       color: white;
     }
-    
+
     .btn-confirm:hover {
       background: #4096ff;
     }
-    
+
     .btn-confirm:disabled {
       background: #d9d9d9;
       cursor: not-allowed;
     }
-    
+
+    /* 输入区域 */
+    .input-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .input-section h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      color: #666;
+      min-width: 45px;
+      line-height: 32px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #1677ff;
+    }
+
     /* 提示信息 */
     .map-tip {
       position: absolute;
@@ -360,8 +399,22 @@
           </div>
         </div>
       </div>
+
+      <!-- 输入坐标定位 -->
+      <div class="input-section">
+        <h4>输入坐标定位</h4>
+        <div class="input-group">
+          <label>经度:</label>
+          <input type="number" id="input-lng" step="0.000001" placeholder="116.397428">
+        </div>
+        <div class="input-group">
+          <label>纬度:</label>
+          <input type="number" id="input-lat" step="0.000001" placeholder="39.90923">
+        </div>
+        <button class="btn btn-confirm" id="goto-btn" style="width: 100%;">定位</button>
+      </div>
     </div>
-    
+
     <!-- 历史记录区域 -->
     <div class="history-section">
       <div class="section-title">已选位置记录</div>
@@ -370,7 +423,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- 地图弹窗 -->
   <div class="modal-overlay" id="map-modal">
     <div class="modal-content">
@@ -408,7 +461,7 @@
     var selectedLng = null;
     var selectedLat = null;
     var historyData = [];
-    
+
     // DOM 元素
     var previewBox = document.getElementById('preview-box');
     var previewEmpty = document.getElementById('preview-empty');
@@ -420,11 +473,11 @@
     var btnConfirm = document.getElementById('btn-confirm');
     var selectedCoords = document.getElementById('selected-coords');
     var historyList = document.getElementById('history-list');
-    
+
     // 预览地图实例
     var previewMap = null;
     var previewMarker = null;
-    
+
     // 初始化地图
     function initMap() {
       map = new AMap.Map('map-container', {
@@ -432,12 +485,12 @@
         zoom: 11,
         center: [116.397428, 39.90923]
       });
-      
+
       AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.MapType', 'AMap.Geolocation', 'AMap.InfoWindow'], function() {
         map.addControl(new AMap.Scale());
         map.addControl(new AMap.ToolBar());
         map.addControl(new AMap.MapType());
-        
+
         // 添加定位控件
         var geolocation = new AMap.Geolocation({
           enableHighAccuracy: true,
@@ -446,44 +499,44 @@
           buttonPosition: 'RB'
         });
         map.addControl(geolocation);
-        
+
         // 创建信息窗口
         infoWindow = new AMap.InfoWindow({
           offset: new AMap.Pixel(0, -30)
         });
-        
+
         // 绑定地图点击事件
         map.on('click', function(e) {
           selectedLng = e.lnglat.getLng();
           selectedLat = e.lnglat.getLat();
-          
+
           // 更新选中信息显示
           selectedCoords.textContent = selectedLng.toFixed(6) + ', ' + selectedLat.toFixed(6);
           btnConfirm.disabled = false;
-          
+
           // 移除旧标记
           if (marker) {
             map.remove(marker);
           }
-          
+
           // 添加新标记
           marker = new AMap.Marker({
             position: e.lnglat,
             title: '选点位置'
           });
           map.add(marker);
-          
+
           // 显示信息窗口
           infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + selectedLng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + selectedLat.toFixed(6) + '</p></div>');
           infoWindow.open(map, e.lnglat);
         });
       });
     }
-    
+
     // 打开弹窗
     function openModal() {
       mapModal.classList.add('active');
-      
+
       // 延迟初始化地图，确保容器已显示
       if (!map) {
         setTimeout(initMap, 100);
@@ -493,7 +546,7 @@
         }, 100);
       }
     }
-    
+
     // 关闭弹窗
     function closeModal() {
       mapModal.classList.remove('active');
@@ -501,7 +554,7 @@
       selectedLat = null;
       selectedCoords.textContent = '未选择';
       btnConfirm.disabled = true;
-      
+
       if (marker) {
         map.remove(marker);
         marker = null;
@@ -510,13 +563,13 @@
         infoWindow.close();
       }
     }
-    
+
     // 初始化预览地图
     function initPreviewMap(lng, lat) {
       if (previewMap) {
         previewMap.destroy();
       }
-      
+
       previewMap = new AMap.Map('preview-map-container', {
         viewMode: '2D',
         zoom: 15,
@@ -526,7 +579,7 @@
         doubleClickZoom: false,
         keyboardEnable: false
       });
-      
+
       // 添加标记
       if (previewMarker) {
         previewMarker.setMap(null);
@@ -537,27 +590,27 @@
       });
       previewMarker.setMap(previewMap);
     }
-    
+
     // 确认选点
     function confirmSelection() {
       if (selectedLng === null || selectedLat === null) return;
-      
+
       // 更新预览框
       previewBox.classList.add('has-location');
       previewEmpty.style.display = 'none';
       previewContent.style.display = 'block';
-      
+
       // 初始化预览地图
       initPreviewMap(selectedLng, selectedLat);
       previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
-      
+
       // 添加到历史记录
       addToHistory(selectedLng, selectedLat);
-      
+
       // 关闭弹窗
       closeModal();
     }
-    
+
     // 添加到历史记录
     function addToHistory(lng, lat) {
       var record = {
@@ -568,14 +621,14 @@
       historyData.unshift(record);
       renderHistory();
     }
-    
+
     // 渲染历史记录
     function renderHistory() {
       if (historyData.length === 0) {
         historyList.innerHTML = '<div class="empty-history">暂无选点记录</div>';
         return;
       }
-      
+
       var html = '';
       historyData.forEach(function(item, index) {
         html += '<div class="history-item">' +
@@ -591,7 +644,7 @@
       });
       historyList.innerHTML = html;
     }
-    
+
     // 使用历史记录
     window.useHistory = function(index) {
       var item = historyData[index];
@@ -601,19 +654,60 @@
       initPreviewMap(item.lng, item.lat);
       previewMapCoords.textContent = '经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6);
     };
-    
+
     // 删除历史记录
     window.deleteHistory = function(index) {
       historyData.splice(index, 1);
       renderHistory();
     };
-    
+
+    // 定位按钮功能
+    document.getElementById('goto-btn').addEventListener('click', function() {
+      var lng = parseFloat(document.getElementById('input-lng').value);
+      var lat = parseFloat(document.getElementById('input-lat').value);
+
+      if (isNaN(lng) || isNaN(lat)) {
+        alert('请输入有效的经纬度坐标');
+        return;
+      }
+
+      // 验证经纬度范围
+      if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+        alert('经度范围：-180 到 180，纬度范围：-90 到 90');
+        return;
+      }
+
+      // 更新预览框
+      previewBox.classList.add('has-location');
+      previewEmpty.style.display = 'none';
+      previewContent.style.display = 'block';
+
+      // 初始化预览地图
+      initPreviewMap(lng, lat);
+      previewMapCoords.textContent = '经度: ' + lng.toFixed(6) + ', 纬度: ' + lat.toFixed(6);
+
+      // 添加到历史记录
+      addToHistory(lng, lat);
+    });
+
+    // 支持回车键触发定位
+    document.getElementById('input-lng').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
+    });
+    document.getElementById('input-lat').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('goto-btn').click();
+      }
+    });
+
     // 事件绑定
     previewBox.addEventListener('click', openModal);
     modalClose.addEventListener('click', closeModal);
     btnCancel.addEventListener('click', closeModal);
     btnConfirm.addEventListener('click', confirmSelection);
-    
+
     // 点击遮罩关闭
     mapModal.addEventListener('click', function(e) {
       if (e.target === mapModal) {
