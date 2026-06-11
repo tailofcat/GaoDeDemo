@@ -289,9 +289,10 @@
       '.amap-picker-preview.has-location { border-style: solid; border-color: #52c41a; background: #f6ffed; padding: 0; }',
       '.amap-picker-preview-icon { font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }',
       '.amap-picker-preview-text { color: #666; font-size: 14px; }',
-      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; pointer-events: none; }',
-      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }',
-      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; pointer-events: none; }',
+      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; }',
+      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; }',
+      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; }',
+      '.amap-picker-preview-click-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20; cursor: pointer; }',
       '.amap-picker-preview-coords { font-size: 13px; font-family: monospace; }',
 
       // 历史记录
@@ -360,6 +361,7 @@
       '      <div class="amap-picker-preview-overlay">',
       '        <div class="amap-picker-preview-coords"></div>',
       '      </div>',
+      '      <div class="amap-picker-preview-click-layer"></div>',
       '    </div>',
       '  </div>',
 
@@ -439,11 +441,23 @@
       if (e.key === 'Enter') self._handleGoto();
     });
 
-    // 预览框点击
-    els.preview.addEventListener('click', function () {
+    // 预览框点击（包括点击层）
+    els.preview.addEventListener('click', function (e) {
+      // 阻止事件冒泡，防止触发其他元素
+      e.stopPropagation();
       self._isFromGotoBtn = false;
       self.open();
     });
+
+    // 点击层事件委托（确保地图渲染后点击仍然有效）
+    var clickLayer = els.preview.querySelector('.amap-picker-preview-click-layer');
+    if (clickLayer) {
+      clickLayer.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self._isFromGotoBtn = false;
+        self.open();
+      });
+    }
 
     // 弹窗关闭
     els.modalClose.addEventListener('click', function () {
@@ -705,28 +719,32 @@
   AmapPicker.prototype._confirmSelection = function () {
     if (this._selectedLng === null || this._selectedLat === null) return;
 
+    var self = this;
     var els = this._elements;
-
-    // 更新预览框
-    els.preview.classList.add('has-location');
-    els.previewEmpty.style.display = 'none';
-    els.previewContent.style.display = 'block';
-
     var fromGotoBtn = this._isFromGotoBtn;
+    var selectedLng = this._selectedLng;
+    var selectedLat = this._selectedLat;
 
     // 先添加历史记录
-    this._addToHistory(this._selectedLng, this._selectedLat, fromGotoBtn);
+    this._addToHistory(selectedLng, selectedLat, fromGotoBtn);
 
     // 重置标记
     this._isFromGotoBtn = false;
 
-    // 初始化预览地图
-    this._initPreviewMap(this._selectedLng, this._selectedLat);
-    els.previewCoords.textContent = '经度: ' + this._selectedLng.toFixed(6) + ', 纬度: ' + this._selectedLat.toFixed(6);
+    // 更新预览框显示
+    els.preview.classList.add('has-location');
+    els.previewEmpty.style.display = 'none';
+    els.previewContent.style.display = 'block';
+    els.previewCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
+
+    // 确保 AMap 加载后再初始化预览地图
+    this._ensureAMapLoaded(function () {
+      self._initPreviewMap(selectedLng, selectedLat);
+    });
 
     var confirmData = {
-      lng: this._selectedLng,
-      lat: this._selectedLat,
+      lng: selectedLng,
+      lat: selectedLat,
       isFromGotoBtn: fromGotoBtn
     };
 
