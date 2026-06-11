@@ -516,7 +516,7 @@
       if (previewMap) {
         previewMap.destroy();
       }
-
+      
       previewMap = new AMap.Map('preview-map-container', {
         viewMode: '2D',
         zoom: 15,
@@ -524,14 +524,9 @@
         dragEnable: false,
         zoomEnable: false,
         doubleClickZoom: false,
-        keyboardEnable: false,
-        showIndoorMap: false,
-        resizeEnable: false
+        keyboardEnable: false
       });
-
-      // 移除所有控件
-      previewMap.clearMap();
-
+      
       // 添加标记
       if (previewMarker) {
         previewMarker.setMap(null);
