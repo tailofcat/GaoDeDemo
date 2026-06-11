@@ -87,11 +87,16 @@
       font-family: monospace;
     }
     
-    /* 预览框中的静态地图 */
-    .preview-map {
+    /* 预览框中的地图 */
+    .preview-content {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      position: relative;
+    }
+    
+    .preview-map-container {
+      width: 100%;
+      height: 100%;
       border-radius: 6px;
     }
     
@@ -103,6 +108,7 @@
       background: linear-gradient(transparent, rgba(0,0,0,0.7));
       padding: 30px 12px 12px;
       color: white;
+      z-index: 10;
     }
     
     .preview-map-coords {
@@ -348,7 +354,7 @@
           <div class="preview-text">点击选择地图位置</div>
         </div>
         <div class="preview-content" id="preview-content" style="display: none;">
-          <img class="preview-map" id="preview-map-img" src="" alt="地图位置">
+          <div id="preview-map-container" class="preview-map-container"></div>
           <div class="preview-map-overlay">
             <div class="preview-map-coords" id="preview-map-coords"></div>
           </div>
@@ -407,7 +413,6 @@
     var previewBox = document.getElementById('preview-box');
     var previewEmpty = document.getElementById('preview-empty');
     var previewContent = document.getElementById('preview-content');
-    var previewMapImg = document.getElementById('preview-map-img');
     var previewMapCoords = document.getElementById('preview-map-coords');
     var mapModal = document.getElementById('map-modal');
     var modalClose = document.getElementById('modal-close');
@@ -415,6 +420,10 @@
     var btnConfirm = document.getElementById('btn-confirm');
     var selectedCoords = document.getElementById('selected-coords');
     var historyList = document.getElementById('history-list');
+    
+    // 预览地图实例
+    var previewMap = null;
+    var previewMarker = null;
     
     // 初始化地图
     function initMap() {
@@ -502,16 +511,31 @@
       }
     }
     
-    // 生成静态地图图片URL
-    function generateStaticMapUrl(lng, lat) {
-      var width = 800;
-      var height = 360;
-      var zoom = 15;
-      var key = '3a8f7c80daf5e3f05cd014c06de9eaab';
-      return 'https://restapi.amap.com/v3/staticmap?location=' + lng + ',' + lat + 
-             '&zoom=' + zoom + '&size=' + width + '*' + height + 
-             '&markers=mid,,A:' + lng + ',' + lat +
-             '&key=' + key;
+    // 初始化预览地图
+    function initPreviewMap(lng, lat) {
+      if (previewMap) {
+        previewMap.destroy();
+      }
+      
+      previewMap = new AMap.Map('preview-map-container', {
+        viewMode: '2D',
+        zoom: 15,
+        center: [lng, lat],
+        dragEnable: false,
+        zoomEnable: false,
+        doubleClickZoom: false,
+        keyboardEnable: false
+      });
+      
+      // 添加标记
+      if (previewMarker) {
+        previewMarker.setMap(null);
+      }
+      previewMarker = new AMap.Marker({
+        position: [lng, lat],
+        title: '选点位置'
+      });
+      previewMarker.setMap(previewMap);
     }
     
     // 确认选点
@@ -523,8 +547,8 @@
       previewEmpty.style.display = 'none';
       previewContent.style.display = 'block';
       
-      // 设置静态地图图片
-      previewMapImg.src = generateStaticMapUrl(selectedLng, selectedLat);
+      // 初始化预览地图
+      initPreviewMap(selectedLng, selectedLat);
       previewMapCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
       
       // 添加到历史记录
@@ -574,7 +598,7 @@
       previewBox.classList.add('has-location');
       previewEmpty.style.display = 'none';
       previewContent.style.display = 'block';
-      previewMapImg.src = generateStaticMapUrl(item.lng, item.lat);
+      initPreviewMap(item.lng, item.lat);
       previewMapCoords.textContent = '经度: ' + item.lng.toFixed(6) + ', 纬度: ' + item.lat.toFixed(6);
     };
     
