@@ -539,14 +539,66 @@
     function openModal() {
       mapModal.classList.add('active');
 
+      // 获取输入框中的坐标
+      var inputLng = parseFloat(document.getElementById('input-lng').value);
+      var inputLat = parseFloat(document.getElementById('input-lat').value);
+
       // 延迟初始化地图，确保容器已显示
       if (!map) {
-        setTimeout(initMap, 100);
+        setTimeout(function() {
+          initMap();
+          // 如果输入了有效坐标，在地图上显示红色标记
+          if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
+            setTimeout(function() {
+              showMarkerOnMap(inputLng, inputLat);
+            }, 200);
+          }
+        }, 100);
       } else {
         setTimeout(function() {
           map.resize();
+          // 如果输入了有效坐标，在地图上显示红色标记
+          if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
+            showMarkerOnMap(inputLng, inputLat);
+          }
         }, 100);
       }
+    }
+
+    // 在地图上显示红色标记
+    function showMarkerOnMap(lng, lat) {
+      var position = new AMap.LngLat(lng, lat);
+
+      // 更新选中信息显示
+      selectedLng = lng;
+      selectedLat = lat;
+      selectedCoords.textContent = lng.toFixed(6) + ', ' + lat.toFixed(6);
+      btnConfirm.disabled = false;
+
+      // 移除旧标记
+      if (marker) {
+        map.remove(marker);
+      }
+
+      // 添加红色标记
+      marker = new AMap.Marker({
+        position: position,
+        title: '定位位置',
+        icon: new AMap.Icon({
+          size: new AMap.Size(25, 34),
+          image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png',
+          imageSize: new AMap.Size(25, 34)
+        })
+      });
+      map.add(marker);
+
+      // 地图中心移到该位置
+      map.setCenter(position);
+      map.setZoom(15);
+
+      // 显示信息窗口
+      infoWindow.setContent('<div style="padding: 10px;"><p><strong>经度:</strong> ' + lng.toFixed(6) + '</p><p><strong>纬度:</strong> ' + lat.toFixed(6) + '</p></div>');
+      infoWindow.open(map, position);
     }
 
     // 关闭弹窗
@@ -679,17 +731,8 @@
         return;
       }
 
-      // 更新预览框
-      previewBox.classList.add('has-location');
-      previewEmpty.style.display = 'none';
-      previewContent.style.display = 'block';
-
-      // 初始化预览地图
-      initPreviewMap(lng, lat);
-      previewMapCoords.textContent = '经度: ' + lng.toFixed(6) + ', 纬度: ' + lat.toFixed(6);
-
-      // 添加到历史记录
-      addToHistory(lng, lat);
+      // 打开地图弹窗并显示红色标记
+      openModal();
     });
 
     // 支持回车键触发定位
