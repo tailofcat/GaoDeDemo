@@ -675,15 +675,22 @@
         keyboardEnable: false
       });
 
-      // 添加标记
-      if (previewMarker) {
-        previewMarker.setMap(null);
-      }
-      previewMarker = new AMap.Marker({
-        position: [lng, lat],
-        title: '选点位置'
+      // 添加所有历史记录标记到预览地图
+      historyData.forEach(function(item) {
+        var isRedMarker = item.isFromGotoBtn === true;
+        var markerIcon = isRedMarker ? 'mark_r.png' : 'mark_b.png';
+        var markerTitle = isRedMarker ? '定位位置' : '历史位置';
+        var historyMarker = new AMap.Marker({
+          position: [item.lng, item.lat],
+          title: markerTitle,
+          icon: new AMap.Icon({
+            size: new AMap.Size(20, 28),
+            image: 'https://webapi.amap.com/theme/v1.3/markers/n/' + markerIcon,
+            imageSize: new AMap.Size(20, 28)
+          })
+        });
+        historyMarker.setMap(previewMap);
       });
-      previewMarker.setMap(previewMap);
     }
 
     // 确认选点
