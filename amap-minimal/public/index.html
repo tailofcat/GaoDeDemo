@@ -464,6 +464,7 @@
     var selectedLng = null;
     var selectedLat = null;
     var historyData = [];
+    var historyMarkers = []; // 存储历史记录标记
 
     // DOM 元素
     var previewBox = document.getElementById('preview-box');
@@ -535,6 +536,30 @@
       });
     }
 
+    // 显示所有历史记录标记
+    function showHistoryMarkers() {
+      // 清除旧的历史标记
+      historyMarkers.forEach(function(m) {
+        map.remove(m);
+      });
+      historyMarkers = [];
+
+      // 添加所有历史记录标记
+      historyData.forEach(function(item, index) {
+        var historyMarker = new AMap.Marker({
+          position: [item.lng, item.lat],
+          title: '历史位置 ' + (index + 1),
+          icon: new AMap.Icon({
+            size: new AMap.Size(20, 28),
+            image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+            imageSize: new AMap.Size(20, 28)
+          })
+        });
+        map.add(historyMarker);
+        historyMarkers.push(historyMarker);
+      });
+    }
+
     // 打开弹窗
     function openModal() {
       mapModal.classList.add('active');
@@ -547,16 +572,22 @@
       if (!map) {
         setTimeout(function() {
           initMap();
+          // 显示所有历史记录标记
+          setTimeout(function() {
+            showHistoryMarkers();
+          }, 200);
           // 如果输入了有效坐标，在地图上显示红色标记
           if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
             setTimeout(function() {
               showMarkerOnMap(inputLng, inputLat);
-            }, 200);
+            }, 300);
           }
         }, 100);
       } else {
         setTimeout(function() {
           map.resize();
+          // 显示所有历史记录标记
+          showHistoryMarkers();
           // 如果输入了有效坐标，在地图上显示红色标记
           if (!isNaN(inputLng) && !isNaN(inputLat) && inputLng >= -180 && inputLng <= 180 && inputLat >= -90 && inputLat <= 90) {
             showMarkerOnMap(inputLng, inputLat);
@@ -616,6 +647,11 @@
       if (infoWindow) {
         infoWindow.close();
       }
+      // 清除历史标记
+      historyMarkers.forEach(function(m) {
+        map.remove(m);
+      });
+      historyMarkers = [];
     }
 
     // 初始化预览地图
