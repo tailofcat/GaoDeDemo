@@ -289,9 +289,10 @@
       '.amap-picker-preview.has-location { border-style: solid; border-color: #52c41a; background: #f6ffed; padding: 0; }',
       '.amap-picker-preview-icon { font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }',
       '.amap-picker-preview-text { color: #666; font-size: 14px; }',
-      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; pointer-events: none; }',
-      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }',
-      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; pointer-events: none; }',
+      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; }',
+      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; }',
+      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; }',
+      '.amap-picker-preview-click-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; cursor: pointer; }',
       '.amap-picker-preview-coords { font-size: 13px; font-family: monospace; }',
 
       // 历史记录
@@ -350,7 +351,7 @@
       '<div class="amap-picker-section">',
       '  <div class="amap-picker-section-title">' + opts.titles.mapSection + '</div>',
       '  <div style="font-size: 13px; color: #666; margin-bottom: 10px;">' + opts.titles.mapTip + '</div>',
-      '  <div class="amap-picker-preview">',
+      '<div class="amap-picker-preview">',
       '    <div class="amap-picker-preview-empty">',
       '      <div class="amap-picker-preview-icon">\u{1F4CD}</div>',
       '      <div class="amap-picker-preview-text">点击选择地图位置</div>',
@@ -361,6 +362,7 @@
       '        <div class="amap-picker-preview-coords"></div>',
       '      </div>',
       '    </div>',
+      '    <div class="amap-picker-preview-click-layer"></div>',
       '  </div>',
 
       // 历史记录
