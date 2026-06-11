@@ -717,8 +717,15 @@
 
     // 定位按钮功能
     document.getElementById('goto-btn').addEventListener('click', function() {
-      var lng = parseFloat(document.getElementById('input-lng').value);
-      var lat = parseFloat(document.getElementById('input-lat').value);
+      var lngInput = document.getElementById('input-lng');
+      var latInput = document.getElementById('input-lat');
+
+      // 如果没有输入值，使用 placeholder 作为默认值
+      var lngValue = lngInput.value || lngInput.placeholder;
+      var latValue = latInput.value || latInput.placeholder;
+
+      var lng = parseFloat(lngValue);
+      var lat = parseFloat(latValue);
 
       if (isNaN(lng) || isNaN(lat)) {
         alert('请输入有效的经纬度坐标');
@@ -730,6 +737,10 @@
         alert('经度范围：-180 到 180，纬度范围：-90 到 90');
         return;
       }
+
+      // 将值回填到输入框
+      lngInput.value = lng;
+      latInput.value = lat;
 
       // 打开地图弹窗并显示红色标记
       openModal();
