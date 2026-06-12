@@ -242,7 +242,7 @@
       '.amap-picker-preview.has-location { border-style: solid; border-color: #52c41a; background: #f6ffed; padding: 0; }',
       '.amap-picker-preview-icon { font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }',
       '.amap-picker-preview-text { color: #666; font-size: 14px; }',
-      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; pointer-events: none; }',
+      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; }',
       '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; }',
       '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; }',
       '.amap-picker-preview-coords { font-size: 13px; font-family: monospace; }',
