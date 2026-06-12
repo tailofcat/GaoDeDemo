@@ -706,34 +706,39 @@
     if (this._selectedLng === null || this._selectedLat === null) return;
 
     var els = this._elements;
+    var self = this;
+
+    var fromGotoBtn = this._isFromGotoBtn;
+    var selectedLng = this._selectedLng;
+    var selectedLat = this._selectedLat;
+
+    // 先关闭弹窗，释放 UI 交互
+    this.close();
 
     // 更新预览框
     els.preview.classList.add('has-location');
     els.previewEmpty.style.display = 'none';
     els.previewContent.style.display = 'block';
-
-    var fromGotoBtn = this._isFromGotoBtn;
-
-    // 先添加历史记录
-    this._addToHistory(this._selectedLng, this._selectedLat, fromGotoBtn);
+    els.previewCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
 
     // 重置标记
     this._isFromGotoBtn = false;
 
-    // 初始化预览地图
-    this._initPreviewMap(this._selectedLng, this._selectedLat);
-    els.previewCoords.textContent = '经度: ' + this._selectedLng.toFixed(6) + ', 纬度: ' + this._selectedLat.toFixed(6);
+    // 添加历史记录
+    this._addToHistory(selectedLng, selectedLat, fromGotoBtn);
 
     var confirmData = {
-      lng: this._selectedLng,
-      lat: this._selectedLat,
+      lng: selectedLng,
+      lat: selectedLat,
       isFromGotoBtn: fromGotoBtn
     };
 
     this.emit('confirm', confirmData);
 
-    // 关闭弹窗
-    this.close();
+    // 异步初始化预览地图，避免阻塞主线程
+    requestAnimationFrame(function () {
+      self._initPreviewMap(selectedLng, selectedLat);
+    });
   };
 
   /**
