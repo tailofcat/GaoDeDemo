@@ -185,55 +185,8 @@
     // 绑定事件
     this._bindEvents();
 
-    // 预加载高德地图脚本（不阻塞初始化）
-    this._preloadAMapScript();
-  };
-
-  /**
-   * 预加载高德地图脚本（在后台加载，不阻塞）
-   */
-  AmapPicker.prototype._preloadAMapScript = function () {
-    var self = this;
-
-    // 设置安全配置
-    if (this.options.securityHost) {
-      window._AMapSecurityConfig = {
-        serviceHost: this.options.securityHost
-      };
-    }
-
-    // 检查是否已加载或正在加载
-    if (typeof AMap !== 'undefined') {
-      this._AMap = AMap;
-      return;
-    }
-
-    // 检查是否已存在脚本标签
-    var existingScript = document.querySelector('script[src*="webapi.amap.com/maps"]');
-    if (existingScript) {
-      // 等待脚本加载完成
-      var checkInterval = setInterval(function () {
-        if (typeof AMap !== 'undefined') {
-          clearInterval(checkInterval);
-          self._AMap = AMap;
-        }
-      }, 100);
-      // 10秒超时
-      setTimeout(function () {
-        clearInterval(checkInterval);
-      }, 10000);
-      return;
-    }
-
-    // 创建脚本标签预加载
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://webapi.amap.com/maps?v=2.0&key=' + this.options.apiKey;
-    script.async = true;
-    script.onload = function () {
-      self._AMap = AMap;
-    };
-    document.head.appendChild(script);
+    // 加载高德地图脚本
+    this._loadAMapScript();
   };
 
   /**
@@ -289,9 +242,9 @@
       '.amap-picker-preview.has-location { border-style: solid; border-color: #52c41a; background: #f6ffed; padding: 0; }',
       '.amap-picker-preview-icon { font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }',
       '.amap-picker-preview-text { color: #666; font-size: 14px; }',
-      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; pointer-events: none; }',
-      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }',
-      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; pointer-events: none; }',
+      '.amap-picker-preview-content { width: 100%; height: 100%; position: relative; }',
+      '.amap-picker-preview-map { width: 100%; height: 100%; border-radius: 6px; }',
+      '.amap-picker-preview-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 12px 12px; color: white; z-index: 10; }',
       '.amap-picker-preview-coords { font-size: 13px; font-family: monospace; }',
 
       // 历史记录
@@ -491,35 +444,30 @@
   };
 
   /**
-   * 确保高德地图脚本已加载（用于弹窗打开时）
-   * @param {Function} callback - 加载完成后的回调
+   * 加载高德地图脚本
    */
-  AmapPicker.prototype._ensureAMapLoaded = function (callback) {
-    var self = this;
+  AmapPicker.prototype._loadAMapScript = function () {
+    if (this._AMap) return; // 已注入或全局已有
 
-    // 如果已经加载，直接回调
-    if (this._AMap || typeof AMap !== 'undefined') {
+    // 设置安全配置
+    if (this.options.securityHost) {
+      window._AMapSecurityConfig = {
+        serviceHost: this.options.securityHost
+      };
+    }
+
+    // 检查是否已加载
+    if (typeof AMap !== 'undefined') {
       this._AMap = AMap;
-      callback();
       return;
     }
 
-    // 等待脚本加载
-    var checkInterval = setInterval(function () {
-      if (typeof AMap !== 'undefined') {
-        clearInterval(checkInterval);
-        self._AMap = AMap;
-        callback();
-      }
-    }, 50);
-
-    // 5秒超时
-    setTimeout(function () {
-      clearInterval(checkInterval);
-      if (!self._AMap) {
-        console.error('高德地图脚本加载超时');
-      }
-    }, 5000);
+    var script = document.createElement('script');
+    script.src = 'https://webapi.amap.com/maps?v=2.0&key=' + this.options.apiKey;
+    script.onload = function () {
+      this._AMap = AMap;
+    }.bind(this);
+    document.head.appendChild(script);
   };
 
   /**
@@ -706,39 +654,34 @@
     if (this._selectedLng === null || this._selectedLat === null) return;
 
     var els = this._elements;
-    var self = this;
-
-    var fromGotoBtn = this._isFromGotoBtn;
-    var selectedLng = this._selectedLng;
-    var selectedLat = this._selectedLat;
-
-    // 先关闭弹窗，释放 UI 交互
-    this.close();
 
     // 更新预览框
     els.preview.classList.add('has-location');
     els.previewEmpty.style.display = 'none';
     els.previewContent.style.display = 'block';
-    els.previewCoords.textContent = '经度: ' + selectedLng.toFixed(6) + ', 纬度: ' + selectedLat.toFixed(6);
+
+    var fromGotoBtn = this._isFromGotoBtn;
+
+    // 先添加历史记录
+    this._addToHistory(this._selectedLng, this._selectedLat, fromGotoBtn);
 
     // 重置标记
     this._isFromGotoBtn = false;
 
-    // 添加历史记录
-    this._addToHistory(selectedLng, selectedLat, fromGotoBtn);
+    // 初始化预览地图
+    this._initPreviewMap(this._selectedLng, this._selectedLat);
+    els.previewCoords.textContent = '经度: ' + this._selectedLng.toFixed(6) + ', 纬度: ' + this._selectedLat.toFixed(6);
 
     var confirmData = {
-      lng: selectedLng,
-      lat: selectedLat,
+      lng: this._selectedLng,
+      lat: this._selectedLat,
       isFromGotoBtn: fromGotoBtn
     };
 
     this.emit('confirm', confirmData);
 
-    // 异步初始化预览地图，避免阻塞主线程
-    requestAnimationFrame(function () {
-      self._initPreviewMap(selectedLng, selectedLat);
-    });
+    // 关闭弹窗
+    this.close();
   };
 
   /**
@@ -836,7 +779,6 @@
     var self = this;
     var els = this._elements;
 
-    // 先显示弹窗，让用户看到界面
     els.modalOverlay.classList.add('active');
 
     // 获取输入框坐标
@@ -850,25 +792,27 @@
                     targetLng >= -180 && targetLng <= 180 &&
                     targetLat >= -90 && targetLat <= 90;
 
-    // 确保地图脚本已加载，然后初始化地图
-    this._ensureAMapLoaded(function () {
-      // 使用 requestAnimationFrame 确保 DOM 已渲染
-      requestAnimationFrame(function () {
-        if (!self._map) {
-          self._initMap();
-        } else {
-          self._map.resize();
+    if (!this._map) {
+      setTimeout(function () {
+        self._initMap();
+        setTimeout(function () {
+          self._showHistoryMarkers();
+        }, 200);
+        if (hasTarget) {
+          setTimeout(function () {
+            self._showMarkerOnMap(targetLng, targetLat);
+          }, 300);
         }
-
-        // 显示历史标记
+      }, 100);
+    } else {
+      setTimeout(function () {
+        self._map.resize();
         self._showHistoryMarkers();
-
-        // 如果有目标坐标，显示标记
         if (hasTarget) {
           self._showMarkerOnMap(targetLng, targetLat);
         }
-      });
-    });
+      }, 100);
+    }
 
     this.emit('open');
   };
